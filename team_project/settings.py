@@ -43,9 +43,8 @@ INSTALLED_APPS = [
     'users',
     'product',
     'shop',
-
+    'cart',
     # 'comparision',
-    # 'cart',
     # 'django_extensions',
     # 'orders',
     # 'promotions',
@@ -153,3 +152,5 @@ CART_SESSION_ID = 'cart'
 CACHE_STORAGE_TIME = 60 * 60 * 24
 
 settings.configure(CACHE_STORAGE_TIME)
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
