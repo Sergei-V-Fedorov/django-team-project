@@ -41,10 +41,8 @@ INSTALLED_APPS = [
     'mptt',
     'users',
     'product',
-    #
-    #
-    # 'shop',
-    #
+    'shop',
+
     # 'comparision',
     # 'cart',
     # 'django_extensions',
