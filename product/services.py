@@ -90,6 +90,23 @@ def apply_filter_to_catalog(request: HttpRequest, queryset: QuerySet) -> QuerySe
     return queryset
 
 
+def apply_sorting_to_catalog(request: HttpRequest, queryset: QuerySet) -> QuerySet:
+    """
+    Возвращает отсортированный список товаров в выбранной категории товаров
+    :param request: HTTP request, в query-string которого указаны параметры сортировки
+    :param queryset: список товаров в выбранной категории товаров
+    :return:
+    """
+    # sorting on price
+    sort_by = request.GET.get('sort', None)
+    if sort_by == 'aprice':
+        queryset = queryset.order_by('avg_price')
+    elif sort_by == 'dprice':
+        queryset = queryset.order_by('-avg_price')
+
+    return queryset
+
+
 class BannersView:
     """Тест. Отображение баннеров"""
     template_name = 'product/banners-view.html'

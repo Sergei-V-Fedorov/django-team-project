@@ -8,6 +8,7 @@ from product.services import (
     get_category,
     get_queryset_for_category,
     apply_filter_to_catalog,
+    apply_sorting_to_catalog,
     BannersView,
     ImageView
 )
@@ -155,13 +156,14 @@ class ProductCatalogView(generic.ListView):
 
         # apply filters parameters to products in catalog
         # insert if condition
-        final_queryset = apply_filter_to_catalog(request=self.request,
-                                                 queryset=cached_data)
+        # filtered_queryset = apply_filter_to_catalog(request=self.request,
+        #                                             queryset=cached_data)
 
         # apply sort parameters to products in catalog
-        # insert method
+        sorted_queryset = apply_sorting_to_catalog(request=self.request,
+                                                   queryset=cached_data)
 
-        return final_queryset
+        return sorted_queryset
 
 
 class IndexView(generic.TemplateView):
