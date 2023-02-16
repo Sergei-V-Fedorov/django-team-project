@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+from django.conf import settings
 from pathlib import Path
 import os
 
@@ -148,3 +149,7 @@ SESSION_COOKIE_AGE = 30 * 24 * 60 * 60
 MPTT_ADMIN_LEVEL_INDENT = 10
 
 CART_SESSION_ID = 'cart'
+
+CACHE_STORAGE_TIME = 60 * 60 * 24
+
+settings.configure(CACHE_STORAGE_TIME)
