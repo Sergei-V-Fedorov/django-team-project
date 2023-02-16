@@ -24,8 +24,8 @@ urlpatterns = [
     path('shop/', include('shop.urls')),
     path('product/', include('product.urls')),
     path('cart/', include('cart.urls')),
+    path('comparison/', include('comparison.urls')),
     # path('promos/', include('promotions.urls', namespace='promo')),
-    # path('comparison/', include('comparison.urls')),
     # path('orders/', include('orders.urls')),
     # ,
 

@@ -1,0 +1,1 @@
+[{"model": "shop.seller", "pk": 1, "fields": {"user": 2, "name": "Рога и копыта", "description": "куплю дешево, продам дорого", "address": "Солнечная Бразилия", "number": 1234567890}}, {"model": "shop.seller", "pk": 2, "fields": {"user": 4, "name": "ElonMusk", "description": "БУ электромобили, БУ мессенжеры", "address": "USA", "number": 2000000000}}]

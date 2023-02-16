@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'product',
     'shop',
     'cart',
-    # 'comparision',
+    'comparison',
     # 'django_extensions',
     # 'orders',
     # 'promotions',
