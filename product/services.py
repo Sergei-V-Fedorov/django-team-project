@@ -31,9 +31,10 @@ def get_queryset_for_category(request: HttpRequest) -> QuerySet:
     category_id = request.GET.get('category', '')
 
     if category_id:  # if category is passed in query-string
-        category = Category.objects.get(id=category_id)
-        parent = category.parent
-        if parent is None:  # if root category, select products of full tree category
+        queryset = Category.objects.get(id=category_id)
+        cache_key = f"category:{category_id}"
+        category = cache.get_or_set(cache_key, queryset, settings.CACHE_STORAGE_TIME)
+        if not category.level:  # if root category, select products of full tree category
             queryset = Product.objects. \
                 select_related('category'). \
                 filter(category__tree_id=category.tree_id).all()
@@ -45,12 +46,8 @@ def get_queryset_for_category(request: HttpRequest) -> QuerySet:
         queryset = Product.objects. \
             select_related('category').all()
     # select required fields and add average price on seller
-    if queryset:
-        queryset = queryset. \
-            values('id', 'name', 'images__image', 'category__name'). \
-            annotate(avg_price=Avg('offers__price')). \
-            order_by('avg_price')
-
+    queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
+        annotate(avg_price=Avg('offers__price')).order_by('avg_price')
     return queryset
 
 
@@ -65,8 +62,10 @@ def apply_filter_to_catalog(request: HttpRequest, queryset: QuerySet) -> QuerySe
     price = request.GET.get('price')
     if price:
         price_from, price_to = map(int, price.split(';'))
-        queryset = queryset.filter(Q(offers__price__gte=price_from) &
-                                   Q(offers__price__lte=price_to))
+        # queryset = queryset.filter(Q(offers__price__gte=price_from) &
+        #                            Q(offers__price__lte=price_to))
+        queryset = queryset.filter(Q(avg_price__gte=price_from) &
+                                   Q(avg_price__lte=price_to))
 
     # filter for seller
     seller = request.GET.get('seller')

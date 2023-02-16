@@ -39,15 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'mptt',
     'users',
     'product',
     'shop',
     'cart',
     'comparison',
+    'orders',
+    'promotions',
     # 'django_extensions',
-    # 'orders',
-    # 'promotions',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'team_project.urls'
@@ -154,3 +156,7 @@ CACHE_STORAGE_TIME = 60 * 60 * 24
 settings.configure(CACHE_STORAGE_TIME)
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+INTERNAL_IPS = [
+    '127.0.0.1'
+]

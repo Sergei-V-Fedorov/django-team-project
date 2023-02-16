@@ -134,9 +134,11 @@ class ProductCatalogView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = get_category()
         context['current_category'] = self.request.GET.get('category', '')
-        context['sellers'] = Seller.objects.all()
-        history_list = HistoryView.objects.all()[:5]
-        context['history_list'] = history_list
+        seller_list = Seller.objects.all()
+        seller_cached = cache.get_or_set('seller_cache', seller_list, settings.CACHE_STORAGE_TIME)
+        context['sellers'] = seller_cached
+        # history_list = HistoryView.objects.all()[:5]
+        # context['history_list'] = history_list
         return context
 
     def get_queryset(self):
@@ -148,6 +150,8 @@ class ProductCatalogView(generic.ListView):
 
         # put queryset to cache
         cached_data = cache.get_or_set(cache_key, queryset, settings.CACHE_STORAGE_TIME)
+        # cached_data = cache.get_or_set(cache_key, queryset, 1)
+
 
         # apply filters parameters to products in catalog
         # insert if condition
