@@ -109,20 +109,38 @@
           <div class="Sort-title">Сортировать по:
           </div>
           <div class="Sort-variants">
-            <a class="Sort-sortBy Sort-sortBy_dec" href="#">Популярности</a>
+            {% if request.GET.sort == 'dpop' %}
+              <a class="Sort-sortBy Sort-sortBy_dec" href="?{% add_query_params request sort='apop' %}">
+                Популярности
+              </a>
+            {% else %}
+              <a class="Sort-sortBy Sort-sortBy_dec" href="?{% add_query_params request sort='dpop' %}">
+                Популярности
+              </a>
+            {% endif %}
+
             {% if request.GET.sort == 'aprice' %}
               <a class="Sort-sortBy" href="?{% add_query_params request sort='dprice' %}">Цене</a>
             {% else %}
               <a class="Sort-sortBy" href="?{% add_query_params request sort='aprice' %}">Цене</a>
             {% endif %}
 
-            {% if request.GET.sort == 'arate' %}
-              <a class="Sort-sortBy" href="?{% add_query_params request sort='drate' %}">Отзывам</a>
-            {% else %}
+            {% if request.GET.sort == 'drate' %}
               <a class="Sort-sortBy" href="?{% add_query_params request sort='arate' %}">Отзывам</a>
+            {% else %}
+              <a class="Sort-sortBy" href="?{% add_query_params request sort='drate' %}">Отзывам</a>
             {% endif %}
 
-            <a class="Sort-sortBy Sort-sortBy_inc" href="#">Новизне</a>
+            {% if request.GET.sort == 'dnew' %}
+              <a class="Sort-sortBy Sort-sortBy_inc" href="?{% add_query_params request sort='anew' %}">
+                Новизне
+              </a>
+            {% else %}
+              <a class="Sort-sortBy Sort-sortBy_inc" href="?{% add_query_params request sort='dnew' %}">
+                Новизне
+              </a>
+            {% endif %}
+
           </div>
         </div>
 

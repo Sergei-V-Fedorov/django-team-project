@@ -1,7 +1,7 @@
 from random import sample
 from django.core.cache import cache
 from django.conf import settings
-from django.db.models import QuerySet, Q, Avg
+from django.db.models import QuerySet, Q, Avg, Max, Count
 from django.http import HttpRequest
 from product.models import Category, Product, Banner, ProductImage
 from orders.models import OrderItem
@@ -112,17 +112,17 @@ def apply_sorting_to_catalog(request: HttpRequest, queryset: QuerySet) -> QueryS
     elif sort_by == 'dprice':
         queryset = queryset.annotate(avg_price=Avg('offers__price')).order_by('-avg_price')
     elif sort_by == 'arate':
-        # queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
-        #            annotate(rating=Avg('feedback__rating')).order_by('rating')
-        # queryset = queryset.values().order_by('feedback__rating')
         queryset = queryset.annotate(rating=Avg('feedback__rating')).order_by('rating')
     elif sort_by == 'drate':
-        # queryset = queryset.order_by('-feedback__rating')
-        # queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
-        #     annotate(rating=Avg('feedback__rating')).order_by('-rating')
         queryset = queryset.annotate(rating=Avg('feedback__rating')).order_by('-rating')
-    # elif sort_by == 'apop':
-    #     queryset = OrderItem.objects.select_related('offer').select_related('order')
+    elif sort_by == 'anew':
+        queryset = queryset.annotate(date=Max('offers__added_at')).order_by('date')
+    elif sort_by == 'dnew':
+        queryset = queryset.annotate(date=Max('offers__added_at')).order_by('-date')
+    elif sort_by == 'apop':
+        queryset = queryset.annotate(count=Count('offers__order_items__offer')).order_by('count')
+    elif sort_by == 'dpop':
+        queryset = queryset.annotate(count=Count('offers__order_items__offer')).order_by('-count')
 
     queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
         annotate(avg_price=Avg('offers__price'))
