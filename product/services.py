@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.models import QuerySet, Q, Avg
 from django.http import HttpRequest
 from product.models import Category, Product, Banner, ProductImage
+from orders.models import OrderItem
 
 
 def get_category(cache_key: str = None,
@@ -37,17 +38,19 @@ def get_queryset_for_category(request: HttpRequest) -> QuerySet:
         if not category.level:  # if root category, select products of full tree category
             queryset = Product.objects. \
                 select_related('category'). \
+                prefetch_related('seller'). \
                 filter(category__tree_id=category.tree_id).all()
         else:  # if child category, select products of this category
             queryset = Product.objects. \
                 select_related('category'). \
+                prefetch_related('seller'). \
                 filter(category=category_id).all()
     else:  # if category isn't passed in query-string
         queryset = Product.objects. \
-            select_related('category').all()
+            select_related('category').prefetch_related('seller').all()
     # select required fields and add average price on seller
-    queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
-        annotate(avg_price=Avg('offers__price')).order_by('avg_price')
+    # queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
+    #     annotate(avg_price=Avg('offers__price')).order_by('avg_price')
     return queryset
 
 
@@ -64,8 +67,10 @@ def apply_filter_to_catalog(request: HttpRequest, queryset: QuerySet) -> QuerySe
         price_from, price_to = map(int, price.split(';'))
         # queryset = queryset.filter(Q(offers__price__gte=price_from) &
         #                            Q(offers__price__lte=price_to))
-        queryset = queryset.filter(Q(avg_price__gte=price_from) &
-                                   Q(avg_price__lte=price_to))
+        # queryset = queryset.filter(Q(avg_price__gte=price_from) &
+        #                            Q(avg_price__lte=price_to))
+        queryset = queryset.filter(Q(offers__price__gte=price_from) &
+                                   Q(offers__price__lte=price_to))
 
     # filter for seller
     seller = request.GET.get('seller')
@@ -87,6 +92,9 @@ def apply_filter_to_catalog(request: HttpRequest, queryset: QuerySet) -> QuerySe
     if stock == 'on':
         pass
 
+    # queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
+    #     annotate(avg_price=Avg('offers__price'))
+
     return queryset
 
 
@@ -100,9 +108,24 @@ def apply_sorting_to_catalog(request: HttpRequest, queryset: QuerySet) -> QueryS
     # sorting on price
     sort_by = request.GET.get('sort', None)
     if sort_by == 'aprice':
-        queryset = queryset.order_by('avg_price')
+        queryset = queryset.annotate(avg_price=Avg('offers__price')).order_by('avg_price')
     elif sort_by == 'dprice':
-        queryset = queryset.order_by('-avg_price')
+        queryset = queryset.annotate(avg_price=Avg('offers__price')).order_by('-avg_price')
+    elif sort_by == 'arate':
+        # queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
+        #            annotate(rating=Avg('feedback__rating')).order_by('rating')
+        # queryset = queryset.values().order_by('feedback__rating')
+        queryset = queryset.annotate(rating=Avg('feedback__rating')).order_by('rating')
+    elif sort_by == 'drate':
+        # queryset = queryset.order_by('-feedback__rating')
+        # queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
+        #     annotate(rating=Avg('feedback__rating')).order_by('-rating')
+        queryset = queryset.annotate(rating=Avg('feedback__rating')).order_by('-rating')
+    # elif sort_by == 'apop':
+    #     queryset = OrderItem.objects.select_related('offer').select_related('order')
+
+    queryset = queryset.values('id', 'name', 'images__image', 'category__name'). \
+        annotate(avg_price=Avg('offers__price'))
 
     return queryset
 
